@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for exploration save modal.
+ * @fileoverview Component for exploration save modal.
  */
 
 require(
