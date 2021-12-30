@@ -17,13 +17,6 @@
  * editor.
  */
 
-import { DeleteHintModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
-import { DeleteLastHintModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -58,7 +51,6 @@ require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
-require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('stateHintsEditor', {
   bindings: {
@@ -70,7 +62,7 @@ angular.module('oppia').component('stateHintsEditor', {
   template: require('./state-hints-editor.component.html'),
   controller: [
     '$filter', '$scope', '$uibModal', 'AlertsService',
-    'EditabilityService', 'ExternalSaveService', 'NgbModal',
+    'EditabilityService', 'ExternalSaveService',
     'StateEditorService', 'StateHintsService',
     'StateInteractionIdService', 'StateNextContentIdIndexService',
     'StateSolutionService',
@@ -78,7 +70,7 @@ angular.module('oppia').component('stateHintsEditor', {
     'INTERACTION_SPECS',
     function(
         $filter, $scope, $uibModal, AlertsService,
-        EditabilityService, ExternalSaveService, NgbModal,
+        EditabilityService, ExternalSaveService,
         StateEditorService, StateHintsService,
         StateInteractionIdService, StateNextContentIdIndexService,
         StateSolutionService,
@@ -161,8 +153,12 @@ angular.module('oppia').component('stateHintsEditor', {
       var openDeleteLastHintModal = function() {
         AlertsService.clearWarnings();
 
-        NgbModal.open(DeleteLastHintModalComponent, {
+        $uibModal.open({
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
+            'modal-templates/delete-last-hint-modal.template.html'),
           backdrop: true,
+          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           StateSolutionService.displayed = null;
           StateSolutionService.saveDisplayedValue();
@@ -182,8 +178,12 @@ angular.module('oppia').component('stateHintsEditor', {
         evt.stopPropagation();
 
         AlertsService.clearWarnings();
-        NgbModal.open(DeleteHintModalComponent, {
+        $uibModal.open({
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
+            'modal-templates/delete-hint-modal.template.html'),
           backdrop: true,
+          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           if (StateSolutionService.savedMemento &&
             StateHintsService.savedMemento.length === 1) {

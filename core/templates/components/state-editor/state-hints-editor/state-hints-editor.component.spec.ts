@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 /**
  * @fileoverview Unit test for State Hints Editor Component.
@@ -25,7 +24,6 @@ describe('StateHintsEditorComponent', () => {
   let $scope = null;
   let $uibModal = null;
   let $q = null;
-  let ngbModal: NgbModal = null;
 
   let WindowDimensionsService = null;
   let EditabilityService = null;
@@ -38,22 +36,11 @@ describe('StateHintsEditorComponent', () => {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
-    ngbModal = $injector.get('NgbModal');
 
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     EditabilityService = $injector.get('EditabilityService');
@@ -168,11 +155,9 @@ describe('StateHintsEditorComponent', () => {
   it('should open delete last hint modal if only one hint exists while' +
     ' changing active hint index', () => {
     spyOn(StateHintsService, 'getActiveHintIndex').and.returnValue(0);
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: $q.resolve()
-      } as NgbModalRef
-    );
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
     StateHintsService.displayed = [
       {
         hintContent: {
@@ -191,11 +176,9 @@ describe('StateHintsEditorComponent', () => {
 
   it('should close delete last hint modal when user clicks cancel', () => {
     spyOn(StateHintsService, 'getActiveHintIndex').and.returnValue(0);
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: $q.reject()
-      } as NgbModalRef
-    );
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
     StateHintsService.displayed = [
       {
         hintContent: {
@@ -208,7 +191,7 @@ describe('StateHintsEditorComponent', () => {
     $scope.changeActiveHintIndex(0);
     $scope.$apply();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect($uibModal.open).toHaveBeenCalled();
   });
 
   it('should delete empty hint when changing active hint index', () => {
@@ -324,16 +307,14 @@ describe('StateHintsEditorComponent', () => {
       }
     ];
     StateHintsService.savedMemento = StateHintsService.displayed;
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: $q.resolve()
-      } as NgbModalRef
-    );
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
 
     $scope.deleteHint(0, new Event(''));
     $scope.$apply();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect($uibModal.open).toHaveBeenCalled();
     expect(StateHintsService.displayed).toEqual([]);
   });
 
@@ -354,11 +335,9 @@ describe('StateHintsEditorComponent', () => {
       }
     ];
     StateHintsService.savedMemento = StateHintsService.displayed;
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: $q.resolve()
-      } as NgbModalRef
-    );
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
 
     $scope.deleteHint(0, new Event(''));
     $scope.$apply();
@@ -373,14 +352,13 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should close delete hint modal when user clicks on cancel', () => {
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: $q.reject()
-      } as NgbModalRef
-    );
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+
     $scope.deleteHint(0, new Event(''));
     $scope.$apply();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect($uibModal.open).toHaveBeenCalled();
   });
 });
