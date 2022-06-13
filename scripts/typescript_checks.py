@@ -834,6 +834,7 @@ def compile_and_check_typescript(config_path: str) -> None:
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
+        # Generate file names from the error messages.
         errors = [x.strip() for x in error_messages]
         # Remove the empty lines and error explanation lines.
         prefixes = ('core', 'extension', 'typings')
@@ -851,6 +852,7 @@ def compile_and_check_typescript(config_path: str) -> None:
             if filename not in NOT_FULLY_TYPE_STRICT_TSCONFIG_FILEPATH:
                 files_not_type_strict.append(filename)
 
+        # Add "typings" folder to get global imports while compiling.
         files_not_type_strict.append('typings')
 
         # Update "include" field of tsconfig-strict.json with files that are
@@ -859,17 +861,20 @@ def compile_and_check_typescript(config_path: str) -> None:
         # Example: List "files_not_type_strict".
         file_name = os.path.join(os.getcwd(), 'tsconfig-strict.json')
         with open(file_name, 'r', encoding='utf-8') as f:
-            jg_dict = yaml.safe_load(f)
-            jg_dict['include'] = files_not_type_strict
+            tsconfig_strict_json_dict = yaml.safe_load(f)
+            tsconfig_strict_json_dict['include'] = files_not_type_strict
 
-        new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
+        tsconfig_strict_json_dict = json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True)
 
         with open(file_name, 'w', encoding='utf-8') as f:
-            f.write(new_index_yaml_dict + '\n')
+            f.write(tsconfig_strict_json_dict + '\n')
 
         # Compile tsconfig-strict.json with updated "include" property.
         os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
         validate_compiled_js_dir()
+
+        if os.path.exists(COMPILED_JS_DIR):
+            shutil.rmtree(COMPILED_JS_DIR)
 
         cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
         process = subprocess.Popen(
@@ -886,13 +891,13 @@ def compile_and_check_typescript(config_path: str) -> None:
         # Update tsconfig-strict.json and set to its intial "include" state
         # example "include": ["core", "extensions", "typings"].
         with open(file_name, 'r', encoding='utf-8') as f:
-            jg_dict = yaml.safe_load(f)
-            jg_dict['include'] = ['core', 'extensions', 'typings']
+            tsconfig_strict_json_dict = yaml.safe_load(f)
+            tsconfig_strict_json_dict['include'] = ['core', 'extensions', 'typings']
 
-        new_index_yaml_dict = json.dumps(jg_dict, indent=2, sort_keys=True)
+        tsconfig_strict_json_dict = json.dumps(tsconfig_strict_json_dict, indent=2, sort_keys=True)
 
         with open(file_name, 'w', encoding='utf-8') as f:
-            f.write(new_index_yaml_dict + '\n')
+            f.write(tsconfig_strict_json_dict + '\n')
 
         if error_messages:
             print('\n' + '\n'.join(error_messages))
