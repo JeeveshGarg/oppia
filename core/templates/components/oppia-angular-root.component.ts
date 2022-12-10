@@ -77,7 +77,9 @@ import { ReviewTestBackendApiService } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
-import 'third-party-imports/ckeditor.import.ts';
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
+import '../third-party-imports/ckeditor.import';
 
 import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
@@ -115,6 +117,27 @@ const componentMap = {
   },
   Video: {
     component_class: NoninteractiveVideo,
+  }
+};
+
+export const registerCustomElements = (injector: Injector): void => {
+  for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
+    const rteElement = createCustomElement(
+      componentMap[rteKey].component_class,
+      {injector});
+    if (
+      customElements.get(
+        'oppia-noninteractive-ckeditor-' +
+        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id
+      ) !== undefined
+    ) {
+      continue;
+    }
+    customElements.define(
+      'oppia-noninteractive-ckeditor-' +
+      ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
+      rteElement
+    );
   }
 };
 
@@ -159,17 +182,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
     }
-
-    for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
-      const rteElement = createCustomElement(
-        componentMap[rteKey].component_class,
-        {injector: this.injector});
-      customElements.define(
-        'oppia-noninteractive-ckeditor-' +
-        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
-        rteElement
-      );
-    }
+    registerCustomElements(this.injector);
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 

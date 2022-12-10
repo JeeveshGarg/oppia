@@ -20,7 +20,9 @@
  * followed by the name of the arg.
  */
 
-require('third-party-imports/leaflet.import');
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
+import '../../../../core/templates/third-party-imports/leaflet.import';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
